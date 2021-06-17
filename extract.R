@@ -49,7 +49,7 @@ list_batches <- dir(paste0(homedir,"downloads/"),pattern= glob2rx("cod_*"))
 print(list_batches)
 
 #### BOUCLE PAR BATCH
-for(batch in list_batches[1]){
+for(batch in list_batches){
   print(batch)
   batch_path <- paste0(homedir,"downloads/",batch,"/")
   
@@ -90,25 +90,33 @@ for(batch in list_batches[1]){
       crs(rprint) <- crs(spdf)
       
       #### SELECTION DES POINTS SUR L'EMPRISE
-      pp <- spdf[rprint,] 
-      #plot(pp)
-      #plot(rprint,add=T)
-      
-      #### INITIALISATION DU FICHIER DE SORTIE (DATES EN PREMIERE COLONNE)
-      ts <- data.frame(matrix(data=dates,ncol=1,nrow=length(dates)))
-      names(ts) <- "dates"
-      
-      #### BOUCLE D'EXTRACTION DES IMAGES PAR POINT
-      for(pts_index in 1:nrow(pp)){
-        print(pts_index)
-        pts          <- pp[pts_index,]
-        plot_id      <- paste0("pid",pts@data$PLOTID)
-        tmp          <- raster::extract(vrt,pts)
-        ts[,plot_id] <- t(tmp)
-        #plot(ts[,paste0("pid",pts@data$PLOTID)])
-      }
-      
-      write.csv(ts,tile_output_name,row.names = F)
+      pp <- spdf[rprint,]
+      if(nrow(pp) >0){
+        print(paste0( "Processing ",nrow(pp)," points"))
+        #plot(pp)
+        #plot(rprint,add=T)
+        
+        #### INITIALISATION DU FICHIER DE SORTIE (DATES EN PREMIERE COLONNE)
+        ts <- data.frame(matrix(data=dates,ncol=1,nrow=length(dates)))
+        names(ts) <- "dates"
+        print(paste0( "Depth ",nrow(ts)," dates"))
+        
+        start_time <- Sys.time()
+        #### BOUCLE D'EXTRACTION DES IMAGES PAR POINT
+        for(pts_index in 1:nrow(pp)){
+          print(pts_index)
+          pts          <- pp[pts_index,]
+          plot_id      <- paste0("pid",pts@data$PLOTID)
+          tmp          <- raster::extract(vrt,pts)
+          ts[,plot_id] <- t(tmp)
+          #plot(ts[,paste0("pid",pts@data$PLOTID)])
+        }
+        
+        
+        write.csv(ts,tile_output_name,row.names = F)
+        print(paste0("Finished in: ",Sys.time() - start_time))
+        
+      }else{print("no points")}
     }
   }
 }
