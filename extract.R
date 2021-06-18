@@ -67,7 +67,7 @@ for(batch in list_batches){
     tile_output_name <- paste0(homedir,"rdc_extract_st/",batch,"_tile",tile_index,"_ts.csv")
     
     if(!file.exists(tile_output_name)){
-      tryCatch({lsat_bbox <- the_pt[,"pts_lsat$bb"]
+      tryCatch({
       
       #### IMAGES ET DATES DE LA TUILE
       vrt   <- brick(paste0(tile,"stack.vrt"))
