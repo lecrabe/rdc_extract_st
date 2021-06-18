@@ -67,6 +67,8 @@ for(batch in list_batches){
     tile_output_name <- paste0(homedir,"rdc_extract_st/",batch,"_tile",tile_index,"_ts.csv")
     
     if(!file.exists(tile_output_name)){
+      tryCatch({lsat_bbox <- the_pt[,"pts_lsat$bb"]
+      
       #### IMAGES ET DATES DE LA TUILE
       vrt   <- brick(paste0(tile,"stack.vrt"))
       dates <- readLines(paste0(tile,"dates.csv"))
@@ -116,7 +118,10 @@ for(batch in list_batches){
         write.csv(ts,tile_output_name,row.names = F)
         print(paste0("Finished in: ",Sys.time() - start_time))
         
+        
       }else{print("no points")}
+      },
+      error=function(e){print(paste0("no image available"))})
     }
   }
 }
